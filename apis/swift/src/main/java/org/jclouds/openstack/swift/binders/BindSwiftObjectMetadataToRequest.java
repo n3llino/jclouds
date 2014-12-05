@@ -74,7 +74,7 @@ public class BindSwiftObjectMetadataToRequest implements Binder {
       }
 
       Blob blob = object2Blob.apply(object);
-	  request = mdBinder.bindToRequest(request, blob);
-	  return (R) request.toBuilder().replaceHeaders(blob.getAllHeaders()).build();
+      request = mdBinder.bindToRequest(request, blob);
+      return (R) request.toBuilder().replaceHeaders(blob.getAllHeaders()).build();
    }
 }

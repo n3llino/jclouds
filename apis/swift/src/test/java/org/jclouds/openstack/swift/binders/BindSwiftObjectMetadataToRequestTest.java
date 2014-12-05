@@ -122,4 +122,25 @@ public class BindSwiftObjectMetadataToRequestTest extends CommonSwiftClientTest 
       binder.bindToRequest(request, null);
    }
 
+   @Test
+   public void testSetHeaders() {
+      SwiftObject object = injector.getInstance(SwiftObject.Factory.class).create(null);
+      Payload payload = Payloads.newStringPayload("");
+      object.setPayload(payload);
+      object.getInfo().setName("foo");
+      object.getAllHeaders().put("custom_header_one", "custom_value_one");
+      object.getAllHeaders().put("custom_header_one", "custom_value_two");
+      object.getAllHeaders().put("custom_header_two", "custom_value_three");
+      
+      BindSwiftObjectMetadataToRequest binder = injector.getInstance(BindSwiftObjectMetadataToRequest.class);
+      HttpRequest requestPOST = HttpRequest.builder().method("POST").endpoint("http://localhost").build();
+      requestPOST = binder.bindToRequest(requestPOST, object);
+      
+      assertEquals(requestPOST.getHeaders().size(), object.getAllHeaders().size());
+      assertEquals(requestPOST.getHeaders().get("custom_header_one").size(), object.getAllHeaders().get("custom_header_one").size());
+      assertEquals(requestPOST.getHeaders().get("custom_header_two").size(), object.getAllHeaders().get("custom_header_two").size());
+      assertEquals(requestPOST.getHeaders().get("custom_header_one").contains("custom_value_one"), true);
+      assertEquals(requestPOST.getHeaders().get("custom_header_one").contains("custom_value_two"), true);
+      assertEquals(requestPOST.getHeaders().get("custom_header_two").contains("custom_value_three"), true);
+   }
 }

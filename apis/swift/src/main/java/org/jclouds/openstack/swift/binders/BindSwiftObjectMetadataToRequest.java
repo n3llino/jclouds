@@ -16,23 +16,25 @@
  */
 package org.jclouds.openstack.swift.binders;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.util.Date;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 
-import com.google.common.io.BaseEncoding;
-import com.google.common.net.HttpHeaders;
-
 import org.jclouds.blobstore.binders.BindUserMetadataToHeadersWithPrefix;
+import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.openstack.swift.blobstore.functions.ObjectToBlob;
 import org.jclouds.openstack.swift.domain.SwiftObject;
 import org.jclouds.rest.Binder;
+
+import com.google.common.io.BaseEncoding;
+import com.google.common.net.HttpHeaders;
 
 @Singleton
 public class BindSwiftObjectMetadataToRequest implements Binder {
@@ -83,7 +85,8 @@ public class BindSwiftObjectMetadataToRequest implements Binder {
                .build();
       }
 
-      request = mdBinder.bindToRequest(request, object2Blob.apply(object));
-      return request;
+      Blob blob = object2Blob.apply(object);
+	  request = mdBinder.bindToRequest(request, blob);
+	  return (R) request.toBuilder().replaceHeaders(blob.getAllHeaders()).build();
    }
 }
